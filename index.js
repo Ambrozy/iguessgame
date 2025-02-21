@@ -25,41 +25,64 @@ const renderChest  = (reward) => `
             <div class="bottom-box"></div>
             <div class="lock"></div>
         </div>
-        <div class="reward">
-            💰
-            <br />
-            ${reward > 0 ? formatNumber(reward) : 'Lose'}
-        </div>
+        ${
+            reward > 0 ? `
+                <div class="reward">
+                    💰
+                    <br />
+                    ${formatNumber(reward)}
+                </div>
+            ` : `
+                <div class="reward lose">
+                    Lose
+                </div>
+            `
+        }
     </div>
 `;
+const renderResult = (level, total) => `
+    Reached level <span class="number">${level}⬆️</span>;
+    Reward: <span class="number">${total}💰</span>
+`;
 const rewards = [-1, 10, 20, 30];
-let total = 0;
-const container = document.querySelector('.container');
+const gameScreen = document.querySelector('#gameScreen');
+const initialScreen = document.querySelector('#initialScreen');
 let bestRecord = Number(localStorage.getItem('bestRecord'));
+let bestLevel = Number(localStorage.getItem('bestLevel'));
 
 function toggleBlocked() {
-    document
-        .querySelector('.container')
-        .classList
-        .toggle('blocked');
+    gameScreen.classList.toggle('blocked');
+}
+function toggleScreen() {
+    gameScreen.classList.toggle('hidden');
+    initialScreen.classList.toggle('hidden');
 }
 function setValue(name, value) {
     document.querySelector(`#${name}`).innerHTML = String(value);
 }
-function generateLevel(level) {
-    container.innerHTML = '';
-    shuffle(rewards).forEach((reward) => {
-        container.insertAdjacentHTML('afterbegin', renderChest(reward * level));
-    });
+function renderStatistic(level) {
     setValue('level', level);
     setValue('minReward', rewards[1] * level);
     setValue('maxReward', rewards[3] * level);
     setValue('bestRecord', bestRecord);
+    setValue('bestLevel', bestLevel);
+}
+function generateLevel(level, total) {
+    renderStatistic(level);
+    gameScreen.innerHTML = '';
+    shuffle(rewards).forEach((reward) => {
+        gameScreen.insertAdjacentHTML('afterbegin', renderChest(reward * level));
+    });
     document
         .querySelectorAll('.chest-container')
         .forEach((element) => {
             element.addEventListener('click', (event) => {
                 event.currentTarget.querySelector('.chest').classList.add('hidden');
+                setTimeout(() => {
+                    document.querySelectorAll('.chest:not(.hidden)').forEach((element) => {
+                        element.classList.add('hidden');
+                    });
+                }, 300);
 
                 const reward = Number(event.currentTarget.dataset.reward);
                 let nextLevel = level + 1;
@@ -67,23 +90,35 @@ function generateLevel(level) {
                 if (reward < 0) {
                     if (total > bestRecord) {
                         bestRecord = total;
+                        bestLevel = level;
                         localStorage.setItem('bestRecord', bestRecord);
+                        localStorage.setItem('bestLevel', bestLevel);
                     }
-                    total = 0;
-                    nextLevel = 1;
-                } else {
-                    total += reward;
+
+                    toggleBlocked();
+                    setTimeout(() => {
+                        document.querySelector('#runResult').innerHTML = renderResult(level, total);
+                        toggleScreen();
+                        toggleBlocked();
+                    }, 2000);
+
+                    return;
                 }
 
+                total += reward;
                 setValue('total', formatNumber(total));
 
                 toggleBlocked();
                 setTimeout(() => {
-                    generateLevel(nextLevel);
+                    generateLevel(nextLevel, total);
                     toggleBlocked();
-                }, 1000);
+                }, 2000);
             });
         });
 }
 
-generateLevel(1);
+renderStatistic(1);
+document.querySelector('#start').addEventListener('click', () => {
+    generateLevel(1, 0);
+    toggleScreen();
+});

@@ -12,13 +12,18 @@
 <body>
     <div class="toolbar">
         Be careful, one of the slot is a trap.<br/>
-        Best Reward: <span id="bestRecord" class="toolbar-value">0</span>;<br/>
-        Total: <span id="total" class="toolbar-value">0</span>;
-        Level: <span id="level" class="toolbar-value">0</span>;
-        Reward: <span class="toolbar-value">
-            <span id="minReward">0</span>–<span id="maxReward">0</span>;
-        </span>
+        Best Level: <span id="bestLevel" class="number">0</span>;
+        Best Reward: <span id="bestRecord" class="number">0</span><br/>
+        Total: <span id="total" class="number">0</span>;
+        Level: <span id="level" class="number">0</span>;
+        Reward: <span class="number"><span id="minReward">0</span>–<span id="maxReward">0</span></span>;
     </div>
-    <div class="container"></div>
+    <div class="container">
+        <div id="initialScreen" class="screen">
+            <div id="runResult"></div>
+            <button type="button" id="start">Start</button>
+        </div>
+        <div id="gameScreen" class="screen hidden"></div>
+    </div>
 </body>
 </html>

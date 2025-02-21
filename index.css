@@ -8,10 +8,13 @@ body {
   text-align: center;
   line-height: 1.3em;
 }
-.toolbar-value {
+.number {
   color: brown;
+  font-weight: bold;
+  font-size: 150%;
 }
 .container {
+  position: relative;
   text-align: center;
   max-width: 600px;
   margin: 10px auto;
@@ -22,7 +25,7 @@ body {
   width: 140px;
   height: 80px;
   margin: 40px;
-  animation: float 5s ease-in-out infinite alternate;
+  animation: float 3s ease-in-out infinite alternate;
 }
 @keyframes float {
   0% { transform: translateY(-5px); }
@@ -34,7 +37,7 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-  transition: opacity 0.2s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
   z-index: 2;
 }
 .lid,
@@ -165,10 +168,34 @@ body {
   box-shadow: inset 0 0 2px darkgoldenrod;
   z-index: 1;
 }
+.reward.lose {
+  color: wheat;
+  background: indianred;
+  border: 2px solid darkred;
+  box-shadow: inset 0 0 2px darkred;
+}
+.screen {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  opacity: 1;
+  visibility: visible;
+  padding: 20px;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 1;
+}
 .hidden {
   opacity: 0;
   pointer-events: none;
 }
 .blocked {
   pointer-events: none;
+}
+
+#start {
+  cursor: pointer;
+  padding: 4px 12px;
+  margin: 10px;
 }
