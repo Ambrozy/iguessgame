@@ -91,6 +91,7 @@ function generateLevel(level, total) {
                         bestLevel = level;
                         localStorage.setItem('bestRecord', bestRecord);
                         localStorage.setItem('bestLevel', bestLevel);
+                        renderStatistic(level);
                     }
 
                     toggleBlocked();
