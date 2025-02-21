@@ -13,6 +13,16 @@ function formatNumber(num) {
     return num >= 1000 ? num.toExponential() : num;
 }
 
+const renderChestReward = (reward) => `
+    <div class="reward">
+        💰<br />${formatNumber(reward)}
+    </div>
+`;
+const renderChestLose = () => `
+    <div class="reward lose">
+        Lose
+    </div>
+`;
 const renderChest  = (reward) => `
     <div class="chest-container" data-reward="${reward}">
         <div class="chest">
@@ -25,19 +35,7 @@ const renderChest  = (reward) => `
             <div class="bottom-box"></div>
             <div class="lock"></div>
         </div>
-        ${
-            reward > 0 ? `
-                <div class="reward">
-                    💰
-                    <br />
-                    ${formatNumber(reward)}
-                </div>
-            ` : `
-                <div class="reward lose">
-                    Lose
-                </div>
-            `
-        }
+        ${reward > 0 ? renderChestReward(reward) : renderChestLose()}
     </div>
 `;
 const renderResult = (level, total) => `
