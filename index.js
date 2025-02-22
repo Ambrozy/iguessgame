@@ -12,6 +12,13 @@ function shuffle(array) {
 function formatNumber(num) {
     return num >= 1000 ? num.toExponential() : num;
 }
+function formatPercent(num) {
+    if (num === 0) {
+        return '0%';
+    }
+
+    return `${num < 0.001 ? (num * 100).toExponential() : (num * 100).toFixed(2)}%`;
+}
 
 const renderChestReward = (reward) => `
     <div class="reward">
@@ -38,15 +45,17 @@ const renderChest  = (reward) => `
         ${reward > 0 ? renderChestReward(reward) : renderChestLose()}
     </div>
 `;
-const renderResult = (level, total) => `
+const renderResult = (level, total, chance) => `
     Reached level <span class="number">${level}⬆️</span>;
-    Reward: <span class="number">${total}💰</span>
+    Reward: <span class="number">${total}💰</span>;
+    Chance: <span class="number">${formatPercent(chance)}</span>
 `;
-const rewards = [-1, 10, 20, 30];
+const rewards = [-1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const gameScreen = document.querySelector('#gameScreen');
 const initialScreen = document.querySelector('#initialScreen');
-let bestRecord = Number(localStorage.getItem('bestRecord'));
-let bestLevel = Number(localStorage.getItem('bestLevel'));
+let bestRecord = Number(localStorage.getItem('bestRecord')) ?? 0;
+let bestLevel = Number(localStorage.getItem('bestLevel')) ?? 0;
+let bestChance = Number(localStorage.getItem('bestChance')) ?? 0;
 
 function toggleBlocked() {
     gameScreen.classList.toggle('blocked');
@@ -58,17 +67,18 @@ function toggleScreen() {
 function setValue(name, value) {
     document.querySelector(`#${name}`).innerHTML = String(value);
 }
-function renderStatistic(level) {
+function renderStatistic(level, formatCount) {
     setValue('level', level);
     setValue('minReward', rewards[1] * level);
-    setValue('maxReward', rewards[3] * level);
-    setValue('bestRecord', bestRecord);
+    setValue('maxReward', rewards[formatCount - 1] * level);
+    setValue('bestRecord', formatNumber(bestRecord));
     setValue('bestLevel', bestLevel);
+    setValue('bestChance', formatPercent(bestChance));
 }
-function generateLevel(level, total) {
-    renderStatistic(level);
+function generateLevel(level, total, formatCount) {
+    renderStatistic(level, formatCount);
     gameScreen.innerHTML = '';
-    shuffle(rewards).forEach((reward) => {
+    shuffle(rewards.slice(0, formatCount)).forEach((reward) => {
         gameScreen.insertAdjacentHTML('afterbegin', renderChest(reward * level));
     });
     document
@@ -83,20 +93,23 @@ function generateLevel(level, total) {
                 }, 300);
 
                 const reward = Number(event.currentTarget.dataset.reward);
+                const chance = Math.pow((formatCount - 1) / formatCount, level - 1);
                 let nextLevel = level + 1;
 
                 if (reward < 0) {
-                    if (total > bestRecord) {
+                    if (chance < bestChance) {
                         bestRecord = total;
                         bestLevel = level;
+                        bestChance = chance;
                         localStorage.setItem('bestRecord', bestRecord);
                         localStorage.setItem('bestLevel', bestLevel);
-                        renderStatistic(level);
+                        localStorage.setItem('bestChance', bestChance);
+                        renderStatistic(level, formatCount);
                     }
 
                     toggleBlocked();
                     setTimeout(() => {
-                        document.querySelector('#runResult').innerHTML = renderResult(level, total);
+                        document.querySelector('#runResult').innerHTML = renderResult(level, total, chance);
                         toggleScreen();
                         toggleBlocked();
                     }, 2000);
@@ -109,15 +122,28 @@ function generateLevel(level, total) {
 
                 toggleBlocked();
                 setTimeout(() => {
-                    generateLevel(nextLevel, total);
+                    generateLevel(nextLevel, total, formatCount);
                     toggleBlocked();
                 }, 2000);
             });
         });
 }
 
-renderStatistic(1);
+const chestCountInput = document.querySelector('#chestCount');
+function getChestCount() {
+    const chestCount = Number(chestCountInput.value) ?? 4;
+
+    return Math.max(Number(chestCountInput.min), Math.min(Number(chestCountInput.max), chestCount));
+}
+
+renderStatistic(1, getChestCount());
+chestCountInput.addEventListener('change', () => {
+    const count = getChestCount();
+
+    chestCountInput.value = count;
+    renderStatistic(1, count);
+});
 document.querySelector('#start').addEventListener('click', () => {
-    generateLevel(1, 0);
+    generateLevel(1, 0, getChestCount());
     toggleScreen();
 });
