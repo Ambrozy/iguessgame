@@ -95,7 +95,7 @@ function generateLevel(level, total, formatCount) {
       let nextLevel = level + 1;
 
       if (reward < 0) {
-        if (chance < bestChance) {
+        if (chance === 0 || chance < bestChance) {
           bestRecord = total;
           bestLevel = level;
           bestChance = chance;
