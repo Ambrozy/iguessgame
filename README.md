@@ -9,3 +9,14 @@ Try it now: https://ambrozy.github.io/iguessgame/
 ```bash
 npm test
 ```
+
+## Running E2E tests with Docker
+
+Build the Playwright image and execute the tests:
+
+```bash
+docker build -t iguessgame-playwright .
+docker run --rm --ipc=host iguessgame-playwright
+```
+
+This allows running the same container image locally and in CI.
