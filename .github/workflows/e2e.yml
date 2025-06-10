@@ -1,0 +1,16 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t iguessgame-playwright .
+      - name: Run Playwright tests
+        run: docker run --rm --ipc=host iguessgame-playwright
