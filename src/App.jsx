@@ -104,10 +104,13 @@ export default function App() {
       if (idx >= 0 && idx < chests.length) {
         openChest(idx);
       }
+      if (e.key === "Enter" && !gameActive) {
+        startGame()
+      }
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [chests]);
+  }, [chests, gameActive]);
 
   return (
     <>
